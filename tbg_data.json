@@ -1,0 +1,63 @@
+{
+  "snapshot_date": "2026-07-21",
+  "brand": "Telluride Bush Gaming",
+  "context": "CoD Challengers team run by Lil Sasquatch, Connor Mook, and Jersey Jerry; powered by Barstool Sports. Long-form livestreams simulcast on Twitch (jerseyjerry) and YouTube (@tBushGaming).",
+  "sources": {
+    "youtube": "Public channel pages via ytInitialData, 2026-07-21",
+    "youtube_growth": "socialcounts.org 28-day table (YouTube Data API-backed), 2026-07-21",
+    "twitch": "TwitchTracker overview + streams list (browser), streamscharts follower snippet, 2026-07-21",
+    "x_instagram": "Public profile search snippets, 2026-07-21 (approximate)"
+  },
+  "platforms": {
+    "youtube": { "handle": "@tBushGaming", "channel_id": "UCN7z0S0GJCcfdJlLCXPedsQ", "subs": 44419, "total_views": 11353945, "videos": 1097, "subs_28d": 1100, "views_28d": 1390000, "uploads_28d": 159, "daily_avg_views": 48000 },
+    "twitch": { "handle": "jerseyjerry", "followers": 24315, "partner": true, "rank_overall": 3690, "last30d": { "hours_streamed": 77, "avg_ccv": 664, "peak_viewers": 3602, "followers_gained": 1030 } },
+    "x": { "handle": "@tBushGaming", "followers": 45100, "approx": true },
+    "instagram": { "handle": "@tbushgaming", "followers": 24000, "approx": true }
+  },
+  "matched_simulcast_streams": [
+    { "date": "2026-07-19", "title": "THE BUSH CRASHES OUT — Team Therapy", "hours": 3.5, "twitch_avg_ccv": 538, "yt_vod_views": 45000, "days_ago": 2 },
+    { "date": "2026-07-18", "title": "Bush Champs Watch Party Day 2 — Win or Go Home", "hours": 7.4, "twitch_avg_ccv": 901, "yt_vod_views": 68000, "days_ago": 3 },
+    { "date": "2026-07-17", "title": "Bush Champs Watch Party Day 1", "hours": 8.7, "twitch_avg_ccv": 581, "yt_vod_views": 71000, "days_ago": 4 },
+    { "date": "2026-07-09", "title": "Did Dave Portnoy Approve Our Budget??", "hours": 1.8, "twitch_avg_ccv": 346, "yt_vod_views": 24000, "days_ago": 12 },
+    { "date": "2026-06-28", "title": "Championship Sunday — Bush Major 4 Watch Party", "hours": 7.0, "twitch_avg_ccv": 579, "yt_vod_views": 42000, "days_ago": 23 },
+    { "date": "2026-06-27", "title": "Bush Major 4 Watch Party — Day 2", "hours": 9.9, "twitch_avg_ccv": 502, "yt_vod_views": 44000, "days_ago": 24 },
+    { "date": "2026-06-26", "title": "Bush Major 4 Watch Party — Day 1", "hours": 7.2, "twitch_avg_ccv": 352, "yt_vod_views": 34000, "days_ago": 25 },
+    { "date": "2026-06-21", "title": "Elite Grand Finals Watch Party — $20K On The Line", "hours": 11.9, "twitch_avg_ccv": 1401, "yt_vod_views": 28000, "days_ago": 30 }
+  ],
+  "yt_stream_vods_recent": [
+    { "title": "THE BUSH CRASHES OUT — TEAM THERAPY", "views": 45000, "days_ago": 2 },
+    { "title": "BUSH CHAMPS WATCH PARTY DAY 2 — WIN OR GO HOME", "views": 68000, "days_ago": 3 },
+    { "title": "BUSH CHAMPS WATCH PARTY DAY 1", "views": 71000, "days_ago": 4 },
+    { "title": "BUSH BBQ", "views": 19000, "days_ago": 4 },
+    { "title": "BUSH IRL HIBACHI STREAM", "views": 15000, "days_ago": 5 },
+    { "title": "BUSH IRL STREAM FROM THE HOUSE", "views": 7900, "days_ago": 5 },
+    { "title": "Jersey Jerry Cold Calls Las Vegas", "views": 11000, "days_ago": 8 },
+    { "title": "Did Dave Portnoy Approve Our Budget??", "views": 24000, "days_ago": 12 },
+    { "title": "CHAMPIONSHIP SUNDAY — BUSH MAJOR 4 WATCH PARTY", "views": 42000, "days_ago": 23 },
+    { "title": "BUSH MAJOR 4 WATCH PARTY — DAY 2", "views": 44000, "days_ago": 24 },
+    { "title": "BUSH MAJOR 4 WATCH PARTY — DAY 1", "views": 34000, "days_ago": 25 },
+    { "title": "CHALLENGER CUP GRAND FINALS VS. P7", "views": 20000, "days_ago": 28 },
+    { "title": "ELITE GRAND FINALS WATCH PARTY — $20K ON THE LINE", "views": 28000, "days_ago": 30 },
+    { "title": "BUSH GAMING WINNER'S FINAL OF ELITE SEASON 4", "views": 15000, "days_ago": 31 },
+    { "title": "Do We Have A Team Pass for Major 4? — EMERGENCY OWNER'S MEETING", "views": 32000, "days_ago": 32 },
+    { "title": "BUSH ELITE PLAYOFFS WATCH PARTY", "views": 24000, "days_ago": 33 }
+  ],
+  "yt_uploads_recent": [
+    { "title": "Reacting to Dave Portnoy's Comments — Owner's Meeting 45", "views": 19000, "days_ago": 0 },
+    { "title": "BUSH OWNERS + PLAYERS ONLY MEETING AT CHAMPS VEGAS", "views": 19000, "days_ago": 5 },
+    { "title": "BUSH CHAMPS HOUSE TOUR", "views": 31000, "days_ago": 6 },
+    { "title": "Sas Is Back From Wyoming & Final Vegas Plans — Owner's Meeting 43", "views": 24000, "days_ago": 8 },
+    { "title": "Bush Players Only Meeting Hosted by Temp — Episode 1", "views": 12000, "days_ago": 13 },
+    { "title": "Champs Is In One Week... — Owner's Meeting 41", "views": 20000, "days_ago": 14 },
+    { "title": "Are We Approved For Champs? — Owner's Meeting 40", "views": 29000, "days_ago": 21 },
+    { "title": "Major 4 Is Here — Owner's Meeting 39", "views": 36000, "days_ago": 28 },
+    { "title": "We Almost Lost Jace — Owner's Meeting 37", "views": 24000, "days_ago": 30 },
+    { "title": "The Paris Budget Is A PROBLEM — Owner's Meeting 36", "views": 60000, "days_ago": 31 },
+    { "title": "BEHIND THE SCENES OF ABE GOING TO TORONTO KOI (?) — Owner's Meeting 35", "views": 43000, "days_ago": 32 },
+    { "title": "Behind The [BUSH] Ep. 6 — Winning", "views": 65000, "days_ago": 33 },
+    { "title": "Building Bush HQ — Ep. 3", "views": 38000, "days_ago": 60 },
+    { "title": "RECAPPING BUSH'S MAJOR 3 WIN — Owner's Meeting 34", "views": 41000, "days_ago": 61 },
+    { "title": "LIVING WITH OUR TEAM AT MAJOR 3 — Owner's Meeting 33", "views": 35000, "days_ago": 62 }
+  ],
+  "notes": "Stream-to-VOD pairing is by date between TwitchTracker's stream log and YouTube Live VODs; confident 1:1 matches only (8 of ~16 recent streams). YouTube live concurrent viewers are not public, so live reach understates by the YouTube live audience. Twitch VODs expire, so YouTube holds the durable archive. A 0.5h stream live at capture time (2026-07-21) was excluded."
+}

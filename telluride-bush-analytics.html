@@ -1,0 +1,587 @@
+<meta charset="utf-8">
+<title>Telluride Bush Gaming Analytics</title>
+<style>
+  :root {
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --good: #006300;
+    --s1: #2a78d6; /* blue   — YouTube */
+    --s2: #1baf7a; /* aqua   — Twitch */
+    --s3: #eda100; /* yellow — X */
+    --s4: #008300; /* green  — Instagram */
+    --tooltip-bg: #0b0b0b;
+    --tooltip-ink: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --baseline: #383835;
+      --border: rgba(255,255,255,0.10); --good: #0ca30c;
+      --s1: #3987e5; --s2: #199e70; --s3: #c98500; --s4: #008300;
+      --tooltip-bg: #fcfcfb; --tooltip-ink: #0b0b0b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --baseline: #383835;
+    --border: rgba(255,255,255,0.10); --good: #0ca30c;
+    --s1: #3987e5; --s2: #199e70; --s3: #c98500; --s4: #008300;
+    --tooltip-bg: #fcfcfb; --tooltip-ink: #0b0b0b;
+  }
+  :root[data-theme="light"] {
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10); --good: #006300;
+    --s1: #2a78d6; --s2: #1baf7a; --s3: #eda100; --s4: #008300;
+    --tooltip-bg: #0b0b0b; --tooltip-ink: #ffffff;
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--page); }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px 64px; }
+
+  header.masthead { padding: 44px 0 12px; border-bottom: 3px solid var(--ink); margin-bottom: 8px; }
+  .kicker { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+  h1 {
+    font-size: clamp(28px, 4.8vw, 50px); font-weight: 900; letter-spacing: -0.015em;
+    text-transform: uppercase; line-height: 1.02; margin: 0 0 10px; text-wrap: balance;
+  }
+  .masthead-sub { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; margin-bottom: 18px; }
+  .masthead-sub p { margin: 0; color: var(--ink-2); font-size: 15px; max-width: 62ch; }
+  .datechip {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; white-space: nowrap;
+  }
+  .disclaimer { font-size: 12.5px; color: var(--muted); margin: 10px 0 0; }
+
+  section { margin-top: 44px; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+  h2 { font-size: 21px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .section-note { color: var(--ink-2); font-size: 14px; margin: 0 0 18px; max-width: 74ch; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px 18px; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 26px; }
+  .tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px 14px; }
+  .tile .t-label { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+  .tile .t-value { font-size: 34px; font-weight: 700; line-height: 1.15; margin-top: 2px; }
+  .tile .t-sub { font-size: 12.5px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+  .tile .t-delta { font-size: 13px; font-weight: 600; color: var(--good); margin-top: 2px; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 14px; }
+  .legend .key { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-2); }
+  .legend .sw { width: 12px; height: 12px; border-radius: 3px; }
+
+  .hbar-row { display: grid; grid-template-columns: 168px 1fr 84px; align-items: center; gap: 12px; margin: 9px 0; }
+  .hbar-name { font-size: 13.5px; font-weight: 600; text-align: right; color: var(--ink); line-height: 1.25; }
+  .hbar-name .sub { display: block; font-weight: 400; font-size: 11.5px; color: var(--muted); }
+  .hbar-track { position: relative; height: 22px; }
+  .bar { height: 22px; border-radius: 0 4px 4px 0; cursor: default; }
+  .bar:hover { filter: brightness(1.12); }
+  .hbar-val { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--ink-2); font-weight: 600; }
+  .axis-note { font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+  /* simulcast paired rows */
+  .pair-head { display: grid; grid-template-columns: 230px 1fr 1.4fr; gap: 14px; margin-bottom: 6px; }
+  .pair-head .ph { font-size: 12px; font-weight: 700; color: var(--ink-2); }
+  .pair-head .ph .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: baseline; }
+  .pair-row { display: grid; grid-template-columns: 230px 1fr 1.4fr; gap: 14px; align-items: center; margin: 10px 0; }
+  .pair-label { font-size: 12.5px; font-weight: 600; text-align: right; line-height: 1.3; }
+  .pair-label .sub { display: block; font-weight: 400; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .pair-cell { position: relative; }
+  .pair-cell .bar { display: inline-block; vertical-align: middle; height: 18px; }
+  .pair-cell .val { display: inline-block; vertical-align: middle; margin-left: 8px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bar.tw { background: var(--s2); }
+  .bar.yt { background: var(--s1); }
+  .bar.fresh { opacity: 0.4; }
+  .tw-strip { display: flex; flex-wrap: wrap; gap: 8px 28px; border-top: 1px solid var(--grid); margin-top: 16px; padding-top: 12px; }
+  .tw-strip .m { font-size: 13px; color: var(--ink-2); }
+  .tw-strip .m strong { color: var(--ink); font-size: 15px; font-variant-numeric: normal; }
+
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 860px) {
+    .duo { grid-template-columns: 1fr; }
+    .hbar-row { grid-template-columns: 120px 1fr 70px; }
+    .pair-head, .pair-row { grid-template-columns: 130px 1fr 1.2fr; gap: 8px; }
+  }
+
+  .panel-sub { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+  .colwrap { position: relative; height: 128px; }
+  .cols { display: flex; align-items: flex-end; gap: 2px; height: 100%; border-bottom: 1px solid var(--baseline); }
+  .col { flex: 1; max-width: 24px; background: var(--s1); border-radius: 4px 4px 0 0; min-height: 2px; cursor: default; }
+  .col:hover { filter: brightness(1.12); }
+  .col.fresh { opacity: 0.4; }
+  .medline { position: absolute; left: 0; right: 0; border-top: 1px solid var(--muted); pointer-events: none; }
+  .medtag { position: absolute; right: 0; transform: translateY(-115%); font-size: 10.5px; color: var(--muted); background: var(--surface); padding: 0 3px; }
+  .maxtick { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+  .p-top { font-size: 12px; color: var(--ink-2); margin: 10px 0 0; line-height: 1.45; border-top: 1px solid var(--grid); padding-top: 8px; }
+  .p-top strong { color: var(--ink); }
+
+  .insights { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+  .insight { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .insight h3 { margin: 0 0 6px; font-size: 14.5px; font-weight: 700; }
+  .insight p { margin: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 13px; }
+  thead th { text-align: right; font-weight: 600; color: var(--ink-2); font-size: 12px; padding: 12px 14px 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+  thead th:first-child, tbody td:first-child { text-align: left; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid var(--grid); text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td:first-child { font-weight: 600; }
+  td .handle { display: block; font-size: 11.5px; color: var(--muted); font-weight: 400; }
+  .na { color: var(--muted); }
+  .tgap { margin-top: 14px; }
+
+  .method { font-size: 14px; color: var(--ink-2); }
+  .method h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 20px 0 6px; }
+  .method h3:first-child { margin-top: 0; }
+  .method ul { margin: 0; padding-left: 20px; }
+  .method li { margin: 5px 0; max-width: 88ch; }
+  .method dt { font-weight: 600; color: var(--ink); }
+  .method dd { margin: 2px 0 10px; max-width: 88ch; }
+
+  footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--grid); font-size: 12.5px; color: var(--muted); }
+
+  #tip {
+    position: fixed; z-index: 50; pointer-events: none; display: none;
+    background: var(--tooltip-bg); color: var(--tooltip-ink);
+    border-radius: 7px; padding: 8px 11px; font-size: 12.5px; line-height: 1.45;
+    max-width: 290px; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  }
+  #tip .tv { font-weight: 700; font-size: 14px; }
+  #tip .tl { opacity: 0.75; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .bar, .col { transition: filter 120ms ease; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <p class="kicker">Portfolio project · Kevin Hamilton</p>
+    <h1>Telluride Bush Gaming Analytics</h1>
+    <div class="masthead-sub">
+      <p>Cross-platform performance tracker for Telluride Bush Gaming — the Call of Duty Challengers team built by Lil Sasquatch, Connor Mook, and Jersey Jerry — across YouTube, Twitch, X, and Instagram, with a focus on how long-form livestreams simulcast on Twitch and YouTube actually perform.</p>
+      <span class="datechip">Snapshot · July 21, 2026</span>
+    </div>
+    <p class="disclaimer">Independent analysis built entirely from public data. Not affiliated with or endorsed by Barstool Sports or Telluride Bush Gaming.</p>
+  </header>
+
+  <div class="kpi-row" id="kpis"></div>
+
+  <section>
+    <p class="eyebrow">Audience</p>
+    <h2>Following by platform</h2>
+    <p class="section-note">The brand splits across a team YouTube/X/Instagram identity (@tBushGaming) and Jersey Jerry's personal Twitch channel, where the streams run. X and Instagram counts come from public profile snippets and are approximate.</p>
+    <div class="card">
+      <div id="audience-chart"></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Simulcast</p>
+    <h2>Same stream, two platforms, two different jobs</h2>
+    <p class="section-note">Every stream airs live on Twitch and YouTube simultaneously. These are the last 8 streams where the Twitch log and the YouTube VOD could be matched 1:1 by date. The two columns measure different things — average concurrent viewers is live attendance; VOD views are on-demand reach that keeps accruing after the stream ends — so they are shown side by side, never summed. Lighter bars are VODs under 7 days old, still accruing.</p>
+    <div class="card">
+      <div class="pair-head">
+        <span></span>
+        <span class="ph"><span class="sw" style="background:var(--s2)"></span>Twitch — avg live viewers</span>
+        <span class="ph"><span class="sw" style="background:var(--s1)"></span>YouTube — VOD views</span>
+      </div>
+      <div id="pairs"></div>
+      <div class="tw-strip" id="twstrip"></div>
+      <p class="axis-note">YouTube's own live concurrent count isn't public, so live attendance shown here (Twitch only) understates total live reach. Twitch VODs expire — YouTube holds the permanent archive, which is why the on-demand column is the durable one.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Content mix</p>
+    <h2>Stream VODs vs. edited uploads</h2>
+    <p class="section-note">Newest on the left; the gray line is each format's matured median (items under 7 days old excluded, shown lighter). Streams run 2–12 hours; uploads are edited shows — mostly the weekly "Owner's Meeting" — that carry the channel between event weekends.</p>
+    <div class="duo">
+      <div class="card">
+        <h3 style="margin:0 0 2px;font-size:15px;">Live stream VODs</h3>
+        <p class="panel-sub" id="streams-sub"></p>
+        <div id="streams-chart"></div>
+        <p class="p-top" id="streams-top"></p>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 2px;font-size:15px;">Uploads — Owner's Meeting &amp; docuseries</h3>
+        <p class="panel-sub" id="uploads-sub"></p>
+        <div id="uploads-chart"></div>
+        <p class="p-top" id="uploads-top"></p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Read</p>
+    <h2>What the numbers say</h2>
+    <div class="insights" id="insights"></div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Data</p>
+    <h2>Tables</h2>
+    <div class="tablewrap">
+      <table id="platform-table">
+        <thead>
+          <tr><th>Platform</th><th>Handle</th><th>Followers</th><th>Growth (~30d)</th><th>Notes</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="tablewrap tgap">
+      <table id="stream-table">
+        <thead>
+          <tr><th>Date</th><th>Stream</th><th>Length</th><th>Twitch avg live</th><th>YT VOD views</th><th>VOD views / hr</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Methodology</p>
+    <h2>How this was built</h2>
+    <div class="card method">
+      <h3>Sources</h3>
+      <ul>
+        <li>YouTube channel, Videos, and Live tabs read from public pages on July 21, 2026; 28-day growth from socialcounts.org (YouTube Data API–backed).</li>
+        <li>Twitch metrics from TwitchTracker (30-day hours, average/peak concurrent viewers, per-stream log) and streamscharts (follower total), same date.</li>
+        <li>X and Instagram follower counts from public profile snippets — approximate, marked as such.</li>
+      </ul>
+      <h3>Definitions</h3>
+      <dl>
+        <dt>Avg concurrent viewers (CCV)</dt>
+        <dd>The average number of people watching the Twitch stream at any moment while it was live — a live-attendance metric.</dd>
+        <dt>VOD views</dt>
+        <dd>YouTube views on the stream's archived recording, which continue accruing after the stream ends. CCV and VOD views are different units and are never summed.</dd>
+        <dt>Matched stream</dt>
+        <dd>A stream where the TwitchTracker log entry and the YouTube Live VOD align 1:1 by date. 8 of the last ~16 streams matched confidently; unmatched ones (multi-stream days, possible single-platform streams) are excluded from the simulcast view but present in the VOD chart.</dd>
+        <dt>Maturity window</dt>
+        <dd>Items under 7 days old are still accruing views — drawn lighter and excluded from medians, same convention as the companion Barstool Show Analytics dashboard.</dd>
+      </dl>
+      <h3>Simulcast caveats</h3>
+      <ul>
+        <li>True live reach = Twitch CCV + YouTube live concurrents, but YouTube doesn't expose live concurrents publicly — so the live column is a floor, not a total.</li>
+        <li>Twitch VODs expire under standard retention, so the YouTube archive is where long-tail value accumulates — one reason VOD-optimized titles/thumbnails matter even for live-first content.</li>
+        <li>Simulcasting splits the live chat/community across two rooms; per-platform chat activity would be the next metric to capture.</li>
+      </ul>
+      <h3>Limitations</h3>
+      <ul>
+        <li>One snapshot; velocity and decay need repeated captures. The three most recent VODs (Champs weekend) are still accruing.</li>
+        <li>Stream-to-VOD pairing is by date; a mismatch would attach the wrong CCV to a VOD. Only confident 1:1 matches are shown.</li>
+        <li>YouTube Shorts, clips channels, TikTok, and podcast audio are out of scope.</li>
+      </ul>
+      <h3>Productionizing this</h3>
+      <ul>
+        <li>Twitch Helix API (streams, followers) + YouTube Data API on a nightly schedule joins the two platforms on stream date/time properly — no manual matching.</li>
+        <li>That unlocks live-vs-VOD decay curves per stream, CCV-by-hour heatmaps (best days/times to stream), and event-weekend lift measurement against baseline weeks.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    Built by Kevin Hamilton as a portfolio piece for a data &amp; analytics role · All figures from public sources, July 21, 2026 · Not affiliated with Barstool Sports or Telluride Bush Gaming
+  </footer>
+</div>
+
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+const DATA = {
+  platforms: [
+    { name: "YouTube", handle: "@tBushGaming", followers: 44419, color: "var(--s1)", growth: "+1.1K subs (+2.5%)", note: "11.35M lifetime views · 1,097 videos" },
+    { name: "X", handle: "@tBushGaming", followers: 45100, color: "var(--s3)", growth: null, note: "approx., public snippet" },
+    { name: "Twitch", handle: "jerseyjerry", followers: 24315, color: "var(--s2)", growth: "+1,030 (+4.2%)", note: "Partner · #3,690 overall" },
+    { name: "Instagram", handle: "@tbushgaming", followers: 24000, color: "var(--s4)", growth: null, note: "approx., public snippet" }
+  ],
+  twitch30: { hours: 77, avg: 664, peak: 3602, followersGained: 1030 },
+  yt28: { views: 1390000, subs: 1100, uploads: 159, daily: 48000 },
+  pairs: [
+    { date: "Jul 19", title: "The Bush Crashes Out — Team Therapy", hours: 3.5, ccv: 538, vod: 45000, d: 2 },
+    { date: "Jul 18", title: "Champs Watch Party Day 2 — Win or Go Home", hours: 7.4, ccv: 901, vod: 68000, d: 3 },
+    { date: "Jul 17", title: "Champs Watch Party Day 1", hours: 8.7, ccv: 581, vod: 71000, d: 4 },
+    { date: "Jul 9", title: "Did Dave Portnoy Approve Our Budget??", hours: 1.8, ccv: 346, vod: 24000, d: 12 },
+    { date: "Jun 28", title: "Championship Sunday — Major 4 Watch Party", hours: 7.0, ccv: 579, vod: 42000, d: 23 },
+    { date: "Jun 27", title: "Major 4 Watch Party — Day 2", hours: 9.9, ccv: 502, vod: 44000, d: 24 },
+    { date: "Jun 26", title: "Major 4 Watch Party — Day 1", hours: 7.2, ccv: 352, vod: 34000, d: 25 },
+    { date: "Jun 21", title: "Elite Grand Finals — $20K On The Line", hours: 11.9, ccv: 1401, vod: 28000, d: 30 }
+  ],
+  streams: [
+    { t: "The Bush Crashes Out — Team Therapy", v: 45000, d: 2 },
+    { t: "Champs Watch Party Day 2 — Win or Go Home", v: 68000, d: 3 },
+    { t: "Champs Watch Party Day 1", v: 71000, d: 4 },
+    { t: "Bush BBQ", v: 19000, d: 4 },
+    { t: "Bush IRL Hibachi Stream", v: 15000, d: 5 },
+    { t: "Bush IRL Stream From The House", v: 7900, d: 5 },
+    { t: "Jersey Jerry Cold Calls Las Vegas", v: 11000, d: 8 },
+    { t: "Did Dave Portnoy Approve Our Budget??", v: 24000, d: 12 },
+    { t: "Championship Sunday — Major 4 Watch Party", v: 42000, d: 23 },
+    { t: "Major 4 Watch Party — Day 2", v: 44000, d: 24 },
+    { t: "Major 4 Watch Party — Day 1", v: 34000, d: 25 },
+    { t: "Challenger Cup Grand Finals vs. P7", v: 20000, d: 28 },
+    { t: "Elite Grand Finals — $20K On The Line", v: 28000, d: 30 },
+    { t: "Winner's Final of Elite Season 4", v: 15000, d: 31 },
+    { t: "Team Pass Emergency Owner's Meeting (live)", v: 32000, d: 32 },
+    { t: "Bush Elite Playoffs Watch Party", v: 24000, d: 33 }
+  ],
+  uploads: [
+    { t: "Reacting to Dave Portnoy's Comments — Owner's Meeting 45", v: 19000, d: 0 },
+    { t: "Bush Owners + Players Only Meeting at Champs Vegas", v: 19000, d: 5 },
+    { t: "Bush Champs House Tour", v: 31000, d: 6 },
+    { t: "Sas Is Back From Wyoming — Owner's Meeting 43", v: 24000, d: 8 },
+    { t: "Players Only Meeting Hosted by Temp — Ep. 1", v: 12000, d: 13 },
+    { t: "Champs Is In One Week — Owner's Meeting 41", v: 20000, d: 14 },
+    { t: "Are We Approved For Champs? — Owner's Meeting 40", v: 29000, d: 21 },
+    { t: "Major 4 Is Here — Owner's Meeting 39", v: 36000, d: 28 },
+    { t: "We Almost Lost Jace — Owner's Meeting 37", v: 24000, d: 30 },
+    { t: "The Paris Budget Is A PROBLEM — Owner's Meeting 36", v: 60000, d: 31 },
+    { t: "Behind the Scenes of Abe to Toronto KOI — OM 35", v: 43000, d: 32 },
+    { t: "Behind The [BUSH] Ep. 6 — Winning", v: 65000, d: 33 },
+    { t: "Building Bush HQ — Ep. 3", v: 38000, d: 60 },
+    { t: "Recapping Bush's Major 3 Win — Owner's Meeting 34", v: 41000, d: 61 },
+    { t: "Living With Our Team at Major 3 — Owner's Meeting 33", v: 35000, d: 62 }
+  ]
+};
+
+const MATURITY_DAYS = 7;
+const fmt = n => {
+  if (n == null) return "—";
+  if (n >= 1e6) return (n / 1e6).toFixed(n >= 10e6 ? 1 : 2).replace(/\.?0+$/, "") + "M";
+  if (n >= 1e3) return (n / 1e3) >= 100 ? Math.round(n / 1e3) + "K" : (n / 1e3).toFixed(1).replace(/\.0$/, "") + "K";
+  return String(n);
+};
+const fmtFull = n => n == null ? "—" : n.toLocaleString("en-US");
+const median = arr => {
+  const s = [...arr].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+};
+const ageLabel = d => d === 0 ? "today" : d === 1 ? "1 day ago" : d < 14 ? d + " days ago" : d < 60 ? "~" + Math.round(d / 7) + " weeks ago" : "~" + Math.round(d / 30) + " months ago";
+const el = (tag, cls, text) => {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+};
+
+/* tooltip */
+const tip = document.getElementById("tip");
+function showTip(evt, rows) {
+  tip.replaceChildren();
+  rows.forEach(([cls, text]) => tip.appendChild(el("div", cls, text)));
+  tip.style.display = "block";
+  moveTip(evt);
+}
+function moveTip(evt) {
+  const pad = 14;
+  let x = evt.clientX + pad, y = evt.clientY + pad;
+  const r = tip.getBoundingClientRect();
+  if (x + r.width > innerWidth - 8) x = evt.clientX - r.width - pad;
+  if (y + r.height > innerHeight - 8) y = evt.clientY - r.height - pad;
+  tip.style.left = x + "px";
+  tip.style.top = y + "px";
+}
+function hideTip() { tip.style.display = "none"; }
+function attachTip(node, rowsFn) {
+  node.addEventListener("pointerenter", e => showTip(e, rowsFn()));
+  node.addEventListener("pointermove", moveTip);
+  node.addEventListener("pointerleave", hideTip);
+  node.tabIndex = 0;
+  node.addEventListener("focus", () => {
+    const r = node.getBoundingClientRect();
+    showTip({ clientX: r.left + r.width / 2, clientY: r.top }, rowsFn());
+  });
+  node.addEventListener("blur", hideTip);
+}
+
+/* derived */
+DATA.streams.forEach(r => r.fresh = r.d < MATURITY_DAYS);
+DATA.uploads.forEach(r => r.fresh = r.d < MATURITY_DAYS);
+DATA.pairs.forEach(p => p.fresh = p.d < MATURITY_DAYS);
+const streamMedian = median(DATA.streams.filter(r => !r.fresh).map(r => r.v));
+const uploadMedian = median(DATA.uploads.filter(r => !r.fresh).map(r => r.v));
+const totalAudience = DATA.platforms.reduce((a, p) => a + p.followers, 0);
+
+/* KPI tiles */
+(function () {
+  const wrap = document.getElementById("kpis");
+  const tiles = [
+    { label: "Cross-platform audience", value: fmt(totalAudience), sub: "YouTube + Twitch + X + Instagram" },
+    { label: "YouTube views added, last 28 days", value: fmt(DATA.yt28.views), delta: "▲ ~" + fmt(DATA.yt28.daily) + " per day", sub: "159 uploads in the window — always-on cadence" },
+    { label: "Twitch avg live viewers, last 30 days", value: fmtFull(DATA.twitch30.avg), sub: "Peak " + fmtFull(DATA.twitch30.peak) + " · " + DATA.twitch30.hours + " hours streamed" },
+    { label: "Fastest-growing corner", value: "+4.2%", sub: "Twitch followers in 30 days (+1,030); YouTube subs +2.5% in 28 days" }
+  ];
+  tiles.forEach(t => {
+    const tile = el("div", "tile");
+    tile.appendChild(el("div", "t-label", t.label));
+    tile.appendChild(el("div", "t-value", t.value));
+    if (t.delta) tile.appendChild(el("div", "t-delta", t.delta));
+    tile.appendChild(el("div", "t-sub", t.sub));
+    wrap.appendChild(tile);
+  });
+})();
+
+/* audience by platform */
+(function () {
+  const chart = document.getElementById("audience-chart");
+  const max = Math.max(...DATA.platforms.map(p => p.followers));
+  DATA.platforms.forEach(p => {
+    const row = el("div", "hbar-row");
+    const name = el("div", "hbar-name", p.name);
+    name.appendChild(el("span", "sub", p.handle));
+    row.appendChild(name);
+    const track = el("div", "hbar-track");
+    const bar = el("div", "bar");
+    bar.style.width = (p.followers / max * 100) + "%";
+    bar.style.background = p.color;
+    attachTip(bar, () => [["tv", fmtFull(p.followers)], ["tl", p.name + " — " + p.handle], ["tl", p.note]]);
+    track.appendChild(bar);
+    row.appendChild(track);
+    row.appendChild(el("div", "hbar-val", fmt(p.followers)));
+    chart.appendChild(row);
+  });
+})();
+
+/* simulcast pairs */
+(function () {
+  const wrap = document.getElementById("pairs");
+  const maxCcv = Math.max(...DATA.pairs.map(p => p.ccv));
+  const maxVod = Math.max(...DATA.pairs.map(p => p.vod));
+  DATA.pairs.forEach(p => {
+    const row = el("div", "pair-row");
+    const label = el("div", "pair-label", p.title);
+    label.appendChild(el("span", "sub", p.date + " · " + p.hours + " hrs"));
+    row.appendChild(label);
+
+    const cvCell = el("div", "pair-cell");
+    const cvBar = el("span", "bar tw");
+    cvBar.style.width = Math.max(p.ccv / maxCcv * 62, 2) + "%";
+    attachTip(cvBar, () => [["tv", fmtFull(p.ccv) + " avg live viewers"], ["tl", p.title], ["tl", p.hours + "-hour stream on Twitch (jerseyjerry)"]]);
+    cvCell.appendChild(cvBar);
+    cvCell.appendChild(el("span", "val", fmtFull(p.ccv)));
+    row.appendChild(cvCell);
+
+    const vodCell = el("div", "pair-cell");
+    const vodBar = el("span", p.fresh ? "bar yt fresh" : "bar yt");
+    vodBar.style.width = Math.max(p.vod / maxVod * 62, 2) + "%";
+    attachTip(vodBar, () => [
+      ["tv", fmt(p.vod) + " VOD views"],
+      ["tl", p.title],
+      ["tl", p.fresh ? "still accruing (under " + MATURITY_DAYS + " days old)" : (p.vod / p.hours >= 1000 ? fmt(Math.round(p.vod / p.hours)) + " views per stream-hour" : "")]
+    ].filter(r => r[1]));
+    vodCell.appendChild(vodBar);
+    vodCell.appendChild(el("span", "val", fmt(p.vod) + (p.fresh ? "†" : "")));
+    row.appendChild(vodCell);
+    wrap.appendChild(row);
+  });
+
+  const strip = document.getElementById("twstrip");
+  [
+    ["Twitch, last 30 days", null],
+    [DATA.twitch30.hours + " hrs", "streamed"],
+    [fmtFull(DATA.twitch30.avg), "avg live viewers"],
+    [fmtFull(DATA.twitch30.peak), "peak viewers"],
+    ["+" + fmtFull(DATA.twitch30.followersGained), "followers gained"]
+  ].forEach(([v, l], i) => {
+    const m = el("span", "m");
+    if (i === 0) { m.textContent = v; m.style.fontWeight = "700"; m.style.color = "var(--ink)"; }
+    else {
+      m.appendChild(el("strong", null, v));
+      m.appendChild(document.createTextNode(" " + l));
+    }
+    strip.appendChild(m);
+  });
+})();
+
+/* stream/upload columns */
+function columnChart(rootId, subId, topId, rows, medianVal, unitLabel) {
+  const root = document.getElementById(rootId);
+  document.getElementById(subId).textContent = "Last " + rows.length + " " + unitLabel + " · matured median " + fmt(medianVal);
+  const max = Math.max(...rows.map(r => r.v));
+  const tick = el("div", "maxtick", "peak " + fmt(max));
+  root.appendChild(tick);
+  const wrap = el("div", "colwrap");
+  const cols = el("div", "cols");
+  rows.forEach(r => {
+    const c = el("div", r.fresh ? "col fresh" : "col");
+    c.style.height = Math.max(r.v / max * 100, 1.5) + "%";
+    attachTip(c, () => {
+      const out = [["tv", fmt(r.v) + " views"], ["tl", r.t], ["tl", ageLabel(r.d)]];
+      out.push(["tl", r.fresh ? "still accruing — excluded from median" : (r.v / medianVal).toFixed(1) + "× format median"]);
+      return out;
+    });
+    cols.appendChild(c);
+  });
+  wrap.appendChild(cols);
+  const med = el("div", "medline");
+  med.style.bottom = (medianVal / max * 100) + "%";
+  med.appendChild(el("span", "medtag", "median " + fmt(medianVal)));
+  wrap.appendChild(med);
+  root.appendChild(wrap);
+  const top = rows.reduce((a, b) => (b.v > a.v ? b : a));
+  const topP = document.getElementById(topId);
+  topP.appendChild(el("strong", null, "Best: "));
+  topP.appendChild(document.createTextNode(top.t + " — " + fmt(top.v) + " views (" + (top.v / medianVal).toFixed(1) + "× median)"));
+}
+columnChart("streams-chart", "streams-sub", "streams-top", DATA.streams, streamMedian, "stream VODs");
+columnChart("uploads-chart", "uploads-sub", "uploads-top", DATA.uploads, uploadMedian, "uploads");
+
+/* insights */
+(function () {
+  const wrap = document.getElementById("insights");
+  const items = [
+    ["Small base, steep slope", "In roughly a month the brand added 1.39M YouTube views, +2.5% in subscribers, and +4.2% in Twitch followers. At 138K total cross-platform audience this is early-stage growth — the trajectory, not the base, is the story."],
+    ["Live is Twitch's job; reach is YouTube's", "Champs Day 1 averaged 581 live viewers on Twitch, and its YouTube VOD passed 71K views within four days — the on-demand audience is two orders of magnitude larger than the live room. Titles and thumbnails on stream VODs deserve upload-level care."],
+    ["Event weekends move every number", "The Champs and Major 4 watch-party weekends own the top of both columns, and the Elite Grand Finals set the live high-water mark: 1,401 average concurrents across an 11.9-hour stream."],
+    ["Watch parties age; personality doesn't", "The Elite finals had the biggest live crowd but its VOD settled at 28K (2.4K views/hr) — results-bound content decays once the outcome is known. Personality-led streams like Team Therapy (45K in two days) travel much better on demand."],
+    ["Owner's Meeting is the efficiency engine", "The edited-show median (35.5K) beats the stream-VOD median (26K) on far less runtime — the meeting format both outperforms per piece and keeps the channel alive between events, with 159 uploads in the last 28 days."]
+  ];
+  items.forEach(([h, p]) => {
+    const card = el("div", "insight");
+    card.appendChild(el("h3", null, h));
+    card.appendChild(el("p", null, p));
+    wrap.appendChild(card);
+  });
+})();
+
+/* tables */
+(function () {
+  const ptb = document.querySelector("#platform-table tbody");
+  DATA.platforms.forEach(p => {
+    const tr = document.createElement("tr");
+    [p.name, p.handle, fmtFull(p.followers), p.growth || "—", p.note].forEach((v, i) => {
+      const td = document.createElement("td");
+      td.textContent = v;
+      if ((i === 3 && v === "—")) td.className = "na";
+      tr.appendChild(td);
+    });
+    ptb.appendChild(tr);
+  });
+
+  const stb = document.querySelector("#stream-table tbody");
+  DATA.pairs.forEach(p => {
+    const tr = document.createElement("tr");
+    const vph = p.fresh ? "accruing" : fmt(Math.round(p.vod / p.hours));
+    [p.date, p.title, p.hours + " hrs", fmtFull(p.ccv), fmt(p.vod) + (p.fresh ? " (accruing)" : ""), vph].forEach(v => {
+      const td = document.createElement("td");
+      td.textContent = v;
+      tr.appendChild(td);
+    });
+    stb.appendChild(tr);
+  });
+})();
+</script>
